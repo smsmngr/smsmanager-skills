@@ -1,0 +1,45 @@
+name: Publish Skills
+
+# Publishes the skills tile when changes land on main.
+# Mirrors the Sinch model: merge to main = published. Fill in the publish step for your
+# distribution channel (skills.sh / Tessl / internal registry) and add the required secret.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "tile.json"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate tile.json and skill paths
+        run: |
+          node -e '
+            const fs = require("fs");
+            const tile = JSON.parse(fs.readFileSync("tile.json", "utf8"));
+            let ok = true;
+            for (const [name, def] of Object.entries(tile.skills || {})) {
+              if (!fs.existsSync(def.path)) { console.error("Missing:", name, def.path); ok = false; }
+            }
+            if (!ok) process.exit(1);
+            console.log("tile.json OK —", Object.keys(tile.skills || {}).length, "skills");
+          '
+
+      # - name: Publish tile
+      #   env:
+      #     PUBLISH_TOKEN: ${{ secrets.SKILLS_PUBLISH_TOKEN }}
+      #   run: npx skills publish    # TODO: replace with the real publish command for your channel
