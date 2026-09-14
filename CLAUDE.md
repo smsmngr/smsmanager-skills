@@ -1,7 +1,8 @@
 # Authoring guide for SmsManager Skills
 
-This repository contains **Agent Skills** for SmsManager's JSON API v2. Each skill teaches an AI
-coding agent how to use one part of the API correctly. Follow these rules when creating or editing a
+This repository contains **Agent Skills** for SmsManager's APIs (JSON API v2 for sending, REST API
+v1 for status/inbox). Each skill teaches an AI coding agent how to use one part of the API
+correctly. Follow these rules when creating or editing a
 skill. They keep the catalog consistent and safe.
 
 ## What a skill is
@@ -54,16 +55,19 @@ metadata:
   `420777123456`).
 - Do not use `<` `>` in YAML frontmatter.
 - Do not add `README.md` or `CHANGELOG.md` inside a skill folder — only `SKILL.md` + resources.
-- Do not invent API fields. Ground everything in the OpenAPI spec:
-  `https://api-ref.smsmanager.com/_bundle/openapi/cs/json/jsonapi_v2.json`
+- Do not invent API fields. Ground everything in the official API reference at
+  `https://smsmanager.com/docs` (source OpenAPI specs live in the internal `smsc` repo under
+  `openapi/`).
 
 ## Conventions
 
-- **Base URL:** `https://api.smsmngr.com/v2`
+- **Base URLs:** `https://api.smsmngr.com/v2` (JSON API v2, sending) and
+  `https://rest-api.smsmngr.com/v1` (REST API v1, status/inbox).
 - **Auth:** `x-api-key: YOUR_API_KEY` header (recommended) or `apikey` query parameter (simple GET).
 - **Credentials** always come from environment variables — never hardcode. Single naming scheme:
   - `SMSMANAGER_API_KEY` (required)
   - `SMSMANAGER_BASE_URL` (optional, default `https://api.smsmngr.com/v2`)
+  - `SMSMANAGER_REST_BASE_URL` (optional, default `https://rest-api.smsmngr.com/v1`)
   - `SMSMANAGER_SENDER` (optional, default sender ID)
 - **Phone numbers:** international E.164 format **without** a leading `+` or `00`, e.g. `420777123456`.
 - Code examples in **curl** plus at least one of Node.js / PHP / Python (PHP is common in our market).

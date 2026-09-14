@@ -1,0 +1,25 @@
+{
+  "name": "smsmanager-skills",
+  "version": "0.2.0",
+  "description": "SmsManager skills for Claude Code — send SMS, Viber, WhatsApp and RCS, check delivery status, handle webhooks and inbound replies.",
+  "author": {
+    "name": "SmsManager",
+    "email": "cc@smsmanager.com",
+    "url": "https://github.com/smsmngr"
+  },
+  "homepage": "https://smsmanager.com",
+  "repository": "https://github.com/smsmngr/smsmanager-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "smsmanager",
+    "sms",
+    "viber",
+    "whatsapp",
+    "rcs",
+    "messaging",
+    "webhooks",
+    "delivery-reports",
+    "ai"
+  ],
+  "skills": "./skills"
+}

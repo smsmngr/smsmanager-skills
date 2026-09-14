@@ -1,23 +1,28 @@
-name: Publish Skills
+name: Validate Skills
 
-# Publishes the skills tile when changes land on main.
-# Mirrors the Sinch model: merge to main = published. Fill in the publish step for your
-# distribution channel (skills.sh / Tessl / internal registry) and add the required secret.
+# Validates the skills catalog and plugin manifests on every push and PR to main.
+# There is no registry publish step: the skills CLI (`npx skills add smsmngr/smsmanager-skills`)
+# and the Claude Code plugin marketplace both install straight from this public repo, so
+# merge to main = published.
 
 on:
   push:
     branches: [main]
     paths:
       - "skills/**"
+      - "scripts/**"
       - "tile.json"
+      - ".claude-plugin/**"
+      - ".github/workflows/publish.yml"
+  pull_request:
+    branches: [main]
   workflow_dispatch: {}
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
-  publish:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,20 +31,11 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Validate tile.json and skill paths
-        run: |
-          node -e '
-            const fs = require("fs");
-            const tile = JSON.parse(fs.readFileSync("tile.json", "utf8"));
-            let ok = true;
-            for (const [name, def] of Object.entries(tile.skills || {})) {
-              if (!fs.existsSync(def.path)) { console.error("Missing:", name, def.path); ok = false; }
-            }
-            if (!ok) process.exit(1);
-            console.log("tile.json OK —", Object.keys(tile.skills || {}).length, "skills");
-          '
+      - name: Validate catalog (tile.json, plugin manifests, SKILL.md lint)
+        run: node scripts/validate.cjs
 
-      # - name: Publish tile
-      #   env:
-      #     PUBLISH_TOKEN: ${{ secrets.SKILLS_PUBLISH_TOKEN }}
-      #   run: npx skills publish    # TODO: replace with the real publish command for your channel
+      - name: Syntax-check bundled scripts
+        run: |
+          for f in $(find skills -name "*.cjs"); do
+            node --check "$f"
+          done

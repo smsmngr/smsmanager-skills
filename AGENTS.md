@@ -20,8 +20,7 @@ Short contributor rules for this skills catalog. The full authoring guide is in
 
 ## Ground truth
 
-All API facts must match the OpenAPI spec:
-`https://api-ref.smsmanager.com/_bundle/openapi/cs/json/jsonapi_v2.json`
+All API facts must match the official API reference at `https://smsmanager.com/docs`.
 
-Base URL `https://api.smsmngr.com/v2`, auth header `x-api-key`, phone numbers in E.164 without a
-leading `+`.
+Base URLs `https://api.smsmngr.com/v2` (sending) and `https://rest-api.smsmngr.com/v1`
+(status/inbox), auth header `x-api-key`, phone numbers in E.164 without a leading `+`.

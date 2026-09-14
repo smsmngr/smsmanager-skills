@@ -1,10 +1,11 @@
 {
   "name": "smsmanager/skills",
-  "version": "0.1.0",
-  "summary": "Official SmsManager API skills for AI coding agents — send SMS, Viber and WhatsApp messages, handle delivery reports and inbound replies, across Czech, Slovak and European networks.",
+  "version": "0.2.0",
+  "summary": "Official SmsManager API skills for AI coding agents — send SMS, Viber, WhatsApp and RCS messages, handle delivery reports and inbound replies, and check message status, across Czech, Slovak and European networks.",
   "skills": {
     "smsmanager-authentication": { "path": "skills/smsmanager-authentication/SKILL.md" },
     "smsmanager-messaging-api": { "path": "skills/smsmanager-messaging-api/SKILL.md" },
-    "smsmanager-delivery-reports": { "path": "skills/smsmanager-delivery-reports/SKILL.md" }
+    "smsmanager-delivery-reports": { "path": "skills/smsmanager-delivery-reports/SKILL.md" },
+    "smsmanager-message-status": { "path": "skills/smsmanager-message-status/SKILL.md" }
   }
 }
