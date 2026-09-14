@@ -1,11 +1,11 @@
 ---
 name: smsmanager-delivery-reports
-description: "Receives SmsManager delivery status, inbound messages and inbound replies via webhooks. Use when handling delivery reports (delivered, undelivered, failed, seen), setting a per-message callback URL, building two-way SMS, processing replies or inbound Viber/WhatsApp messages, verifying webhook payloads, or correlating webhooks with sent messages via request_id, message_id and custom payload. Do NOT use for sending messages (see smsmanager-messaging-api)."
+description: "Receives SmsManager delivery status, inbound messages and inbound replies via webhooks. Use when handling delivery reports (delivered, undelivered, failed, seen), setting a per-message callback URL, building two-way SMS, processing replies or inbound Viber/WhatsApp messages, interpreting rejection codes, verifying webhook payloads, or correlating webhooks with sent messages via request_id, message_id and custom payload. Do NOT use for sending messages (see smsmanager-messaging-api) or for polling status via the REST API (see smsmanager-message-status)."
 metadata:
   author: SmsManager
-  version: 1.0.0
+  version: 1.1.0
   category: Messaging
-  tags: webhooks, delivery-reports, dlr, status, callback, inbound, two-way-sms, replies, viber, whatsapp
+  tags: webhooks, delivery-reports, dlr, status, callback, inbound, two-way-sms, replies, viber, whatsapp, rcs, rejection-codes
   uses:
     - smsmanager-authentication
     - smsmanager-messaging-api
@@ -16,7 +16,8 @@ metadata:
 SmsManager notifies your application with HTTP POST webhooks for three events: a message's **delivery
 status** changes, an **inbound message** arrives, or a recipient **replies** to a message you sent.
 Use this skill to receive and process those callbacks. To *send* messages, use
-smsmanager-messaging-api.
+smsmanager-messaging-api. To *poll* message status via the REST API (lookups, backfill,
+reconciliation) instead of receiving webhooks, use smsmanager-message-status.
 
 ## Agent Instructions
 
@@ -82,7 +83,8 @@ Full payload field tables and JSON examples: [references/webhooks.md](references
 - You first receive `sent`; further statuses follow as the operator reports them.
 - **`rejected`** means the message was **never sent** (typically insufficient credit or an invalid
   number) — not a normal delivery outcome.
-- `result_info` carries an additional human-readable code, e.g. `"[0] Delivered"`.
+- `result_info` carries an additional code/text, e.g. `"[0] Delivered"` or `"[307] Insufficient
+  credit"` — see the rejection-code table in [references/webhooks.md](references/webhooks.md).
 
 ### Correlation fields
 
@@ -139,7 +141,6 @@ if (e.type === "incoming" && /^stop/i.test((e.body || "").trim())) {
 
 ## Links
 
-- API reference (Webhooks): https://api-ref.smsmanager.com
-- OpenAPI spec: https://api-ref.smsmanager.com/_bundle/openapi/cs/json/jsonapi_v2.json
-- Dashboard: https://app.smsmanager.com
-- Related skills: smsmanager-messaging-api, smsmanager-authentication
+- Developer docs / API reference: https://smsmanager.com/docs (Czech: https://smsmanager.cz/docs)
+- Dashboard: https://app.smsmanager.com/app/developers/
+- Related skills: smsmanager-messaging-api, smsmanager-authentication, smsmanager-message-status

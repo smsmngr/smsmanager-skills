@@ -9,7 +9,8 @@ There are two WhatsApp channel types for the `flow`:
   template or messaged you first (the 24-hour customer-service window).
 
 Both require a registered WhatsApp number. The `sender` is the **phone number ID** of your registered
-WhatsApp number, found in [WhatsApp settings](https://app.smsmanager.com/whatsapp).
+WhatsApp number, found in [WhatsApp settings](https://app.smsmanager.com/whatsapp). A sender alias
+may be used instead, and `sender` may also be supplied once in the root Message object.
 
 ## whatsapp_template
 

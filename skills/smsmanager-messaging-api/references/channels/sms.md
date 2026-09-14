@@ -9,8 +9,8 @@ The `sms` channel is used inside a `flow` entry, or implicitly when you send wit
 | Field | Type | Required | Default | Notes |
 |-------|------|----------|---------|-------|
 | `body` | string (≤1000) | yes (in flow) | — | Overrides the root `body` for this channel. |
-| `sender` | string | no | account default | Alphanumeric name (max 11 chars, may need pre-registration) or a reserved virtual number (without `+`). |
-| `gateway` | enum | no | `high` | `high`, `direct`, or `custom`. See below. |
+| `sender` | string | no | root `sender`, then account `default_sender` | Alphanumeric name (max 11 chars, may need pre-registration), a reserved virtual number (without `+`), or a sender alias. |
+| `gateway` | enum | no | `high` | `high`, `lowcost`, `direct`, `custom`, `simhost`, `gsm`. See below. |
 | `ttl` | integer | no | — | Time-to-live in **minutes** before an undelivered message expires. |
 | `type` | enum | no | `utf` | `utf` keeps Unicode; `sms` converts/removes Unicode to maximize capacity. See encoding. |
 
@@ -19,10 +19,15 @@ The `sms` channel is used inside a `flow` entry, or implicitly when you send wit
 | Value | Use when |
 |-------|----------|
 | `high` | Default. Standard high-quality routing. |
+| `lowcost` | Low-cost routing. |
 | `direct` | You are sending from a dedicated **virtual number**. |
 | `custom` | You are using **SIM hosting**. |
+| `simhost` | You are using **SIM hosting**. |
+| `gsm` | You are using your **own GSM gateway**. |
 
-`gateway` selects the routing/sending method — it is not a price tier.
+`gateway` selects the routing/sending method. When omitted, it can be resolved automatically from
+the sender registered for your account: a dedicated virtual number selects `direct` (including
+`direct` pricing); otherwise the default routing is used. An explicitly set `gateway` always wins.
 
 ## Encoding: `type` = `utf` vs `sms`
 

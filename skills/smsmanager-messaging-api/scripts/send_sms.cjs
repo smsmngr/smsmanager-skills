@@ -12,7 +12,7 @@
  *   --message   Message body (max 1000 chars). Required.
  *   --sender    Sender ID (alphanumeric max 11 chars, or virtual number). Optional.
  *   --type      "utf" (default, keeps Unicode) or "sms" (strips Unicode for GSM-7 capacity).
- *   --gateway   "high" (default), "direct" (virtual number), or "custom" (SIM hosting).
+ *   --gateway   "high" (default), "lowcost", "direct" (virtual number), "custom"/"simhost" (SIM hosting), or "gsm" (own GSM gateway).
  *   --tag       Message tag (default "promotional"; special: "priority", "transactional").
  *   --help      Show this help.
  *
@@ -49,7 +49,7 @@ function parseArgs(argv) {
 function usageAndExit(code) {
   process.stderr.write(
     "Usage: node send_sms.cjs --to <number[,number...]> --message <text> " +
-      "[--sender <id>] [--type utf|sms] [--gateway high|direct|custom] [--tag <tag>]\n"
+      "[--sender <id>] [--type utf|sms] [--gateway high|lowcost|direct|custom|simhost|gsm] [--tag <tag>]\n"
   );
   process.exit(code);
 }

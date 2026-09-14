@@ -1,20 +1,20 @@
 ---
 name: smsmanager-messaging-api
-description: "Sends SMS, Viber and WhatsApp messages through the SmsManager JSON API v2 across Czech, Slovak and European networks. Use when sending a transactional or marketing SMS, sending to multiple recipients, sending a batch of different messages, choosing a sender ID, sending Unicode/diacritics correctly, scheduling messages, using the omnichannel flow with channel fallback, tagging messages, or attaching a custom payload. Endpoints: POST /message, POST /messages, GET/POST /simple/message. Do NOT use for receiving delivery reports or inbound replies (see smsmanager-delivery-reports)."
+description: "Sends SMS, Viber, WhatsApp and RCS messages through the SmsManager JSON API v2 across Czech, Slovak and European networks. Use when sending a transactional or marketing SMS, sending a priority message or one-time password, sending to multiple recipients, sending a batch of different messages, choosing a sender ID or sender alias, sending Unicode/diacritics correctly, scheduling messages, using the omnichannel flow with channel fallback, shortening links, tagging messages, or attaching a custom payload. Endpoints: POST /message, POST /message/priority, POST /messages, GET/POST /simple/message. Do NOT use for receiving delivery reports or inbound replies (see smsmanager-delivery-reports)."
 metadata:
   author: SmsManager
-  version: 1.0.0
+  version: 1.1.0
   category: Messaging
-  tags: sms, bulk-sms, transactional, marketing, viber, whatsapp, omnichannel, flow, sender-id, unicode, gsm7, scheduling, batch, czech, slovak, europe
+  tags: sms, bulk-sms, transactional, marketing, viber, whatsapp, rcs, omnichannel, flow, sender-id, sender-alias, unicode, gsm7, scheduling, batch, priority, otp, czech, slovak, europe
   uses:
     - smsmanager-authentication
 ---
 
 # SmsManager Messaging API Overview
 
-Send SMS, Viber and WhatsApp messages with one unified JSON API. A single request can target up to
-10 recipients, schedule delivery, pick a sender ID, and define an omnichannel **flow** that falls
-back from one channel to the next. Use this skill whenever the user wants to send a message through
+Send SMS, Viber, WhatsApp and RCS messages with one unified JSON API. A single request can target up
+to 10 recipients, schedule delivery, pick a sender ID (or a per-country sender alias), and define an
+omnichannel **flow** that falls back from one channel to the next. Use this skill whenever the user wants to send a message through
 SmsManager.
 
 For receiving delivery status, inbound messages, or replies, use **smsmanager-delivery-reports**.
@@ -23,9 +23,10 @@ For receiving delivery status, inbound messages, or replies, use **smsmanager-de
 
 Before generating code, gather from the user (skip any item already specified):
 
-1. **Goal** — one message to a few recipients (`/message`), many different messages at once
-   (`/messages`), or a single quick send (`/simple/message`)?
-2. **Channel(s)** — SMS only, or omnichannel (SMS / Viber / WhatsApp) with fallback?
+1. **Goal** — one message to a few recipients (`/message`), a time-critical message like an OTP
+   (`/message/priority`), many different messages at once (`/messages`), or a single quick send
+   (`/simple/message`)?
+2. **Channel(s)** — SMS only, or omnichannel (SMS / Viber / WhatsApp / RCS) with fallback?
 3. **Sender ID** — alphanumeric name (max 11 chars, may need pre-registration) or a numeric/virtual
    number? Read it from `SMSMANAGER_SENDER` if set.
 4. **Content** — does the body contain diacritics or non-Latin characters? That affects encoding
@@ -75,6 +76,7 @@ node scripts/send_sms.cjs --to 420777123456 --message "Ahoj!"
 | Endpoint | Use for | Body |
 |----------|---------|------|
 | `POST /message` | One message to up to **10 recipients**. | A single Message object. |
+| `POST /message/priority` | Same as `/message`, but processed by the **priority queue** — for OTPs and time-critical transactional messages. | A single Message object. |
 | `POST /messages` | **Up to 10 different** messages in one call, each to up to 10 recipients. | An array of Message objects. |
 | `GET /simple/message` | A quick single send via query string. | Query params: `apikey`, `phone_number`, `message`, `sender`. |
 | `POST /simple/message` | A quick single send via POST. | Minimal body. |
@@ -87,19 +89,20 @@ Full parameter tables and response shapes: [references/endpoints.md](references/
 |-------|----------|-------------|
 | `body` | yes* | Message text, max 1000 chars. *Required unless set inside a `flow` channel. |
 | `to` | yes | Array of 1–10 recipients, each `{ "phone_number": "420777123456" }` (E.164, no leading `+`). |
-| `flow` | no | Ordered list of channels (SMS / Viber / WhatsApp) with fallback. See below. |
+| `sender` | no | Default sender for all flow steps (a step's own `sender` wins). Name, virtual number, or a **sender alias**. See "Senders and aliases" below. |
+| `flow` | no | Ordered list of channels (SMS / Viber / WhatsApp / RCS) with fallback. See below. |
 | `tag` | no | Group label, default `promotional`. Special: `priority`, `transactional`. |
 | `datetime` | no | Schedule send time, UTC (`2025-01-11T10:00:00Z`). |
 | `delivery_time` | no | Allowed delivery window (days + start/end + timezone). |
 | `callback` | no | Per-message webhook URL for delivery reports. |
 | `payload` | no | Arbitrary object echoed back in delivery and reply webhooks. |
-| `params` | no | Special features (e.g. link shortening) — ask SmsManager support. |
+| `params` | no | Special features: `_url` (automatic link shortening) and `_incoming` (auto-replies, forwarding replies to email/webhook). |
 
 ### The omnichannel `flow`
 
 `flow` is an **ordered array** of channel objects. Each entry contains **exactly one** channel:
-`sms`, `viber`, `whatsapp_text`, or `whatsapp_template`. Order = fallback priority: if the first
-channel can't deliver (or the recipient doesn't accept it), the next is tried.
+`sms`, `viber`, `whatsapp_text`, `whatsapp_template`, or `rcs`. Order = fallback priority: when a
+step defines `ttl` and its `ttl_condition` isn't met within the TTL, the next step is tried.
 
 ```json
 "flow": [
@@ -108,13 +111,24 @@ channel can't deliver (or the recipient doesn't accept it), the next is tried.
 ]
 ```
 
-If you omit `flow`, the message is sent as a plain SMS using your account defaults. A body defined
-inside a `flow` channel overrides the root `body`.
+If you omit `flow`, a single `sms` step is used with its gateway left unset, so it can be resolved
+from your registered sender (see Gotchas); an unset gateway routes and is priced like `high`. A
+`body` or `sender` defined inside a `flow` channel overrides the root value.
 
 Per-channel details:
 - SMS: [references/channels/sms.md](references/channels/sms.md) — `sender`, `gateway`, `type`, `ttl`, encoding.
 - Viber: [references/channels/viber.md](references/channels/viber.md) — `sender`, `buttons`, `ttl`.
 - WhatsApp: [references/channels/whatsapp.md](references/channels/whatsapp.md) — `whatsapp_text` vs `whatsapp_template`.
+- RCS: [references/channels/rcs.md](references/channels/rcs.md) — `sender` (RCS agent), `ttl`.
+
+### Senders and aliases
+
+Resolution order per flow step: the step's own `sender` → the root `sender` → your account's
+`default_sender` (set via `POST /apikey/update` on the REST API). The value must fit the step's
+channel: a name or number for `sms`/`viber`, a Phone Number ID for WhatsApp, an agent for `rcs` —
+for a step whose channel it isn't registered for, it is ignored. A **sender alias** is one name,
+configured for your account by support, that resolves to a different registered sender per
+recipient country — useful for one campaign spanning CZ/SK/EU.
 
 ### Scheduling
 
@@ -176,8 +190,11 @@ Language code samples: [Node.js](references/examples/node.md) · [PHP](reference
 - **Sender IDs.** Alphanumeric sender names are max 11 characters and often require pre-registration;
   in some countries/operators alphanumeric senders aren't supported for replies. Numeric/virtual
   numbers are passed without a `+`.
-- **`gateway` values are `high` / `direct` / `custom`** — not a price tier. Use `direct` with a
-  dedicated virtual number and `custom` with SIM hosting. Default is `high`.
+- **`gateway` values are `high` / `lowcost` / `direct` / `custom` / `simhost` / `gsm`.** `high` is
+  the default quality routing, `lowcost` is low-cost routing, `direct` is for a dedicated virtual
+  number, `custom` and `simhost` for SIM hosting, `gsm` for your own GSM gateway. When omitted, the
+  gateway can resolve automatically from your registered sender (a dedicated virtual number selects
+  `direct`, including `direct` pricing); an explicitly set `gateway` always wins.
 - **Limits.** Up to 10 recipients per message; up to 10 messages per `/messages` call (so up to ~100
   recipients per API call). For larger campaigns, page across multiple calls.
 - **`ttl` is in minutes** — the time-to-live before an undelivered message expires.
@@ -196,8 +213,7 @@ Language code samples: [Node.js](references/examples/node.md) · [PHP](reference
 
 ## Links
 
-- API reference: https://api-ref.smsmanager.com
-- OpenAPI spec: https://api-ref.smsmanager.com/_bundle/openapi/cs/json/jsonapi_v2.json
-- Dashboard: https://app.smsmanager.com
+- Developer docs / API reference: https://smsmanager.com/docs (Czech: https://smsmanager.cz/docs)
+- Dashboard / API keys: https://app.smsmanager.com/app/developers/
 - WhatsApp settings: https://app.smsmanager.com/whatsapp
-- Related skills: smsmanager-authentication, smsmanager-delivery-reports
+- Related skills: smsmanager-authentication, smsmanager-delivery-reports, smsmanager-message-status

@@ -10,7 +10,7 @@ with an `sms` fallback so recipients without Viber still get the message.
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
 | `body` | string (≤1000) | yes | Overrides the root `body` for this channel. |
-| `sender` | string | yes | The sender name you pre-registered for Viber Business messaging. |
+| `sender` | string | yes* | The sender name you pre-registered for Viber Business messaging, or a sender alias. *May also be supplied via the root `sender`. |
 | `buttons` | array (max 1) | no | A single call-to-action button: `{ "title": "…", "url": "https://…" }`. |
 | `ttl` | integer | no | Time-to-live in **minutes**. |
 

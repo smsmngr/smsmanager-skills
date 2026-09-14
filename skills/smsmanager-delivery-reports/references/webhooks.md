@@ -15,13 +15,14 @@ Fires when the delivery status of a message you sent changes. Use it to store de
 |-------|------|-------|
 | `request_id` | string | Id of the original send request. |
 | `message_id` | string | Per-message id. For `POST /messages`, has `-<recipient_index>` appended. |
-| `gateway` | string | Channel used: `sms`, `viber`, `whatsapp_text`, `whatsapp_template`. |
+| `gateway` | string | Channel used: `sms`, `viber`, `whatsapp_text`, `whatsapp_template`, `rcs`. |
 | `timestamp` | integer | Unix timestamp (seconds). |
 | `payload` | object | Your custom data from the original send, echoed back. |
 | `type` | string | `outgoing`. |
 | `to` | object | `{ "phone_number": "420777123456" }`. |
 | `result` | string | `delivered`, `undelivered`, `rejected`, `failed`, `sending`, `sent`, `seen`. |
-| `result_info` | string | Additional code/text, e.g. `"[0] Delivered"`. |
+| `result_info` | string | Additional code/text in `"[code] Description"` format (either part may be missing), e.g. `"[0] Delivered"`. See rejection codes below. |
+| `sms` / `viber` / `whatsapp_body` / `whatsapp_template` | object | Per-channel stats for the used channel. See below. |
 
 ```json
 [
@@ -54,6 +55,33 @@ delivered ──► seen          (chat channels)
   number). Handle it separately from `undelivered`/`failed`.
 - Statuses can arrive out of order and over time — track the latest per `message_id`, and dedupe on
   `message_id` + `result`.
+
+### Common rejection codes (`result_info`)
+
+| Code | Meaning |
+|------|---------|
+| `[302]` | Invalid phone number format. |
+| `[303]` | Phone number is not in the allowed list. |
+| `[304]` | Phone number is blacklisted or opted-out. |
+| `[306]` | Too many identical messages for the same recipient. |
+| `[307]` | Insufficient credit. |
+
+Other codes may appear (including channel-specific ones like WhatsApp payment errors); always treat
+the code as informative text, not an exhaustive enum.
+
+### Per-channel stats object
+
+A `sentMessage` event carries one sub-object named after the used channel — `sms`, `viber`,
+`whatsapp_body`, or `whatsapp_template` — with the actual sending details:
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `sender` | string | The sender actually used. |
+| `country` | integer | Destination country as an official **MCC** code. |
+| `operator` | integer | Destination operator as an **MNC** code (`0` = unknown/general). |
+| `price_czk` / `price_eur` | number | Price of the message. |
+| `count` | integer | Number of billed parts/segments. |
+| `gateway` | string | (`sms` object only) the specific gateway settings used. |
 
 ---
 

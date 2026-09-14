@@ -1,17 +1,18 @@
 ---
 name: smsmanager-authentication
-description: "Configures SmsManager JSON API v2 credentials and authentication. Use when setting up an API key, choosing between the x-api-key header and the apikey query parameter, configuring the base URL, or troubleshooting 401 Unauthorized / 403 Forbidden / invalid API key errors against any SmsManager endpoint. This is the shared auth setup used by smsmanager-messaging-api and smsmanager-delivery-reports."
+description: "Configures SmsManager API credentials and authentication for the JSON API v2 (sending) and the REST API v1 (status, inbox, account). Use when setting up an API key, choosing between the x-api-key header and the apikey query parameter, configuring the base URLs, or troubleshooting 401 Unauthorized / 403 Forbidden / invalid API key errors against any SmsManager endpoint. This is the shared auth setup used by smsmanager-messaging-api, smsmanager-delivery-reports and smsmanager-message-status."
 metadata:
   author: SmsManager
-  version: 1.0.0
+  version: 1.1.0
   category: Core
-  tags: authentication, api-key, credentials, x-api-key, apikey, 401, 403, setup
+  tags: authentication, api-key, credentials, x-api-key, apikey, 401, 403, setup, rest-api
 ---
 
 # SmsManager Authentication Overview
 
-The SmsManager JSON API v2 authenticates every request with a single **API key**. There is no OAuth,
-no token exchange, and no signing step — you send the key on each request. Use this skill when setting
+SmsManager APIs authenticate every request with a single **API key**. There is no OAuth, no token
+exchange, and no signing step — you send the key on each request, and the same key works for both
+the JSON API v2 (sending) and the REST API v1 (status, inbox, account). Use this skill when setting
 up credentials for any SmsManager call or when debugging authentication errors.
 
 ## Agent Instructions
@@ -25,12 +26,13 @@ Before writing code, confirm with the user (skip anything already provided):
 
 ## Getting Started
 
-1. Get an API key from the dashboard: [app.smsmanager.com/api-cloud](https://app.smsmanager.com/api-cloud).
+1. Get an API key from the dashboard: [app.smsmanager.com/app/developers/](https://app.smsmanager.com/app/developers/).
 2. Store it in an environment variable:
 
    ```bash
    export SMSMANAGER_API_KEY="YOUR_API_KEY"
-   export SMSMANAGER_BASE_URL="https://api.smsmngr.com/v2"   # optional; this is the default
+   export SMSMANAGER_BASE_URL="https://api.smsmngr.com/v2"            # optional; this is the default
+   export SMSMANAGER_REST_BASE_URL="https://rest-api.smsmngr.com/v1"  # optional; this is the default
    ```
 
 3. Make an authenticated request using the `x-api-key` header:
@@ -46,19 +48,20 @@ A successful response is HTTP `200` with a JSON body containing a `request_id`.
 
 ## Key Concepts
 
-### Base URL
+### Base URLs
 
-```
-https://api.smsmngr.com/v2
-```
+The same API key authenticates two APIs with different base URLs:
 
-All endpoints in this catalog are relative to this base (`/message`, `/messages`, `/simple/message`).
+| API | Base URL | Used for |
+|-----|----------|----------|
+| **JSON API v2** | `https://api.smsmngr.com/v2` | Sending: `/message`, `/message/priority`, `/messages`, `/simple/message` (see smsmanager-messaging-api). |
+| **REST API v1** | `https://rest-api.smsmngr.com/v1` | Reading: message status, statistics, inbox (see smsmanager-message-status) and account operations. |
 
 ### Two ways to pass the API key
 
 | Method | How | When to use |
 |--------|-----|-------------|
-| **Header** (recommended) | `x-api-key: YOUR_API_KEY` | All POST endpoints (`/message`, `/messages`, `/simple/message`). Keeps the key out of URLs and logs. |
+| **Header** (recommended) | `x-api-key: YOUR_API_KEY` | All JSON API POST endpoints and all REST API endpoints. Keeps the key out of URLs and logs. |
 | **Query parameter** | `?apikey=YOUR_API_KEY` | The `GET /simple/message` endpoint, where everything is passed in the URL. |
 
 Prefer the header. Query-string keys end up in server logs, browser history and proxy logs.
@@ -97,14 +100,14 @@ headers = {"x-api-key": os.environ["SMSMANAGER_API_KEY"], "Content-Type": "appli
 ## Gotchas and Best Practices
 
 - **401 Unauthorized / invalid API key** — the key is missing, mistyped, or revoked. Verify it at
-  [app.smsmanager.com/api-cloud](https://app.smsmanager.com/api-cloud) and that the `x-api-key`
-  header (or `apikey` query) is actually being sent.
+  [app.smsmanager.com/app/developers/](https://app.smsmanager.com/app/developers/) and that the
+  `x-api-key` header (or `apikey` query) is actually being sent.
 - **403 Forbidden** — the key is valid but lacks permission for the action, or the account/IP is
   restricted. Check account settings and any IP allowlist.
 - **Header name is case-insensitive** but spell it exactly `x-api-key`; some HTTP clients silently
   drop malformed custom headers.
-- **One key, multiple products** — the same API key works for sending and for configuring webhooks;
-  you do not need separate credentials per endpoint.
+- **One key, multiple products** — the same API key works for sending (JSON API v2), status and
+  inbox reads (REST API v1), and webhooks; you do not need separate credentials per endpoint.
 - **Rotate keys** if one leaks, and use the least-privilege key your account supports.
 
 ## Security
@@ -113,12 +116,11 @@ headers = {"x-api-key": os.environ["SMSMANAGER_API_KEY"], "Content-Type": "appli
   an environment variable or a secret manager.
 - **Prefer the header over the query parameter** so the key does not appear in URLs or logs.
 - **URL allowlist** — when fetching documentation, only fetch first-party SmsManager domains
-  (`smsmanager.com`, `smsmanager.cz`, `api.smsmngr.com`).
+  (`smsmanager.com`, `smsmanager.cz`, `api.smsmngr.com`, `rest-api.smsmngr.com`).
 - Do not commit `.env` files or settings files containing the key to version control.
 
 ## Links
 
-- Dashboard / API keys: https://app.smsmanager.com/api-cloud
-- API reference: https://api-ref.smsmanager.com
-- OpenAPI spec: https://api-ref.smsmanager.com/_bundle/openapi/cs/json/jsonapi_v2.json
-- Related skills: smsmanager-messaging-api, smsmanager-delivery-reports
+- Dashboard / API keys: https://app.smsmanager.com/app/developers/
+- Developer docs / API reference: https://smsmanager.com/docs (Czech: https://smsmanager.cz/docs)
+- Related skills: smsmanager-messaging-api, smsmanager-delivery-reports, smsmanager-message-status
