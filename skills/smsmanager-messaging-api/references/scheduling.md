@@ -20,6 +20,8 @@ Schedule a message for a specific moment. Always interpreted as **UTC**.
 - Convert local time to UTC yourself. For example, 11:00 in `Europe/Prague` (CET, UTC+1) is
   `10:00:00Z`.
 - Omit `datetime` to send immediately.
+- A scheduled message can be **cancelled before it is sent** via REST `POST /messaging/cancel` with
+  its `message_id` — see the smsmanager-bulk-messaging skill.
 
 ## `delivery_time` — allowed delivery window
 

@@ -1,7 +1,7 @@
 {
   "name": "smsmanager-skills",
-  "version": "0.2.0",
-  "description": "SmsManager skills for Claude Code — send SMS, Viber, WhatsApp and RCS, check delivery status, handle webhooks and inbound replies.",
+  "version": "0.3.0",
+  "description": "SmsManager skills for Claude Code — send SMS, Viber, WhatsApp and RCS (incl. JSONL bulk campaigns), check delivery status, handle webhooks, manage opt-out lists, and order senders and numbers.",
   "author": {
     "name": "SmsManager",
     "email": "cc@smsmanager.com",

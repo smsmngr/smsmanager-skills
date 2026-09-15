@@ -23,7 +23,7 @@ description: "<what it does> Use when <intents>. Do NOT use for <X> (see smsmana
 metadata:
   author: SmsManager
   version: 1.0.0                       # per-skill semver, independent of tile.json version
-  category: Core | Messaging | Numbers
+  category: Core | Messaging | Numbers | Account
   tags: comma, separated, keywords    # a STRING, not a YAML list
   uses:                               # other skills this one depends on (optional)
     - smsmanager-authentication

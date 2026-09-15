@@ -3,7 +3,7 @@ name: smsmanager-message-status
 description: "Reads delivery status, sending statistics and received messages from the SmsManager REST API v1. Use when checking whether a message was delivered or seen, looking up a message by message_id, listing sent messages for a date, getting per-request or per-day sending statistics, checking message price, or reading inbound SMS from the inbox by date. Endpoints: GET /message, GET /messages, GET /request, GET /requests, GET /inbox on https://rest-api.smsmngr.com/v1. Do NOT use for sending (see smsmanager-messaging-api) or for real-time webhooks (see smsmanager-delivery-reports)."
 metadata:
   author: SmsManager
-  version: 1.0.0
+  version: 1.1.0
   category: Messaging
   tags: status, delivery, message-status, statistics, inbox, polling, reporting, rest-api, price, reconciliation
   uses:
@@ -143,7 +143,8 @@ integer counters, the tags seen that day, and `msg_mccmnc` — message counts pe
 network (MCC+MNC key, e.g. `"23001"`).
 
 **Daily inbox sweep (incl. opt-outs):** `GET /inbox?date=2026-07-30`, then scan `body` for STOP-like
-keywords and honour them. Real-time inbound handling belongs to smsmanager-delivery-reports.
+keywords and honour them — persist each one with `POST /optout` (see smsmanager-optout-blacklist).
+Real-time inbound handling belongs to smsmanager-delivery-reports.
 
 ## Gotchas and Best Practices
 
@@ -179,4 +180,5 @@ keywords and honour them. Real-time inbound handling belongs to smsmanager-deliv
 
 - Developer docs / API reference: https://smsmanager.com/docs (Czech: https://smsmanager.cz/docs)
 - Dashboard / API keys: https://app.smsmanager.com/app/developers/
-- Related skills: smsmanager-authentication, smsmanager-messaging-api, smsmanager-delivery-reports
+- Related skills: smsmanager-authentication, smsmanager-messaging-api, smsmanager-delivery-reports,
+  smsmanager-optout-blacklist, smsmanager-bulk-messaging

@@ -1,8 +1,9 @@
 # SmsManager Skills
 
 AI agent skills for the SmsManager messaging API. Get expert guidance on sending SMS, Viber,
-WhatsApp and RCS messages, handling delivery reports, checking message status, and processing
-inbound replies — right inside your AI coding agent.
+WhatsApp and RCS messages (including JSONL bulk campaigns), handling delivery reports, checking
+message status, processing inbound replies, managing opt-out lists, and ordering senders and
+numbers — right inside your AI coding agent.
 
 These skills teach your agent how to use the **SmsManager APIs** correctly: the omnichannel `flow`
 model, sender IDs and aliases, Unicode vs GSM encoding, scheduling, batch sends, delivery/reply
@@ -37,6 +38,9 @@ API. You only need an API key when you want to send a real message.
 | [smsmanager-messaging-api](skills/smsmanager-messaging-api/SKILL.md) | Messaging | Send SMS, Viber, WhatsApp and RCS via `/message`, `/message/priority`, `/messages` and `/simple/message` — omnichannel `flow`, sender IDs and aliases, Unicode, scheduling, batch, tags, custom payloads. |
 | [smsmanager-delivery-reports](skills/smsmanager-delivery-reports/SKILL.md) | Messaging | Delivery-status, inbound-message and inbound-reply webhooks (`callback` URL), status codes, rejection codes, two-way SMS. |
 | [smsmanager-message-status](skills/smsmanager-message-status/SKILL.md) | Messaging | Poll message status, list sent messages, per-request/per-day statistics and the inbox via the REST API v1 (`/message`, `/messages`, `/request`, `/requests`, `/inbox`). |
+| [smsmanager-optout-blacklist](skills/smsmanager-optout-blacklist/SKILL.md) | Messaging | Manage the opt-out list and blacklist — add/remove numbers, download the lists as CSV (`/optout`, `/blacklist`). |
+| [smsmanager-services](skills/smsmanager-services/SKILL.md) | Account | Order paid services — alphanumeric senders, dedicated numbers, SIM hosting — with dry-run fee preview; check credit balance; cancel services (`/credit/services`, `/credit/order`, `/credit/cancel`). |
+| [smsmanager-bulk-messaging](skills/smsmanager-bulk-messaging/SKILL.md) | Messaging | Mass-send from a JSONL file via presigned upload, validate messages without sending, cancel scheduled messages and bulk uploads (`/messaging/url`, `/messaging/validate`, `/messaging/cancel`). |
 
 ## Repository structure
 

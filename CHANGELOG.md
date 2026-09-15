@@ -4,6 +4,33 @@ All notable changes to this skills catalog are documented here. The format is ba
 [Keep a Changelog](https://keepachangelog.com/). Individual skills have their own versions in their
 `SKILL.md` metadata.
 
+## 2026-09-15 — catalog 0.3.0
+
+Second release of the day, extending the catalog to the REST API v1 account and campaign surface.
+
+### Added
+
+- `smsmanager-optout-blacklist` v1.0.0 — manage the opt-out list and blacklist:
+  add/remove/download numbers (`GET/POST/DELETE /optout`, `/blacklist`), STOP-reply persistence,
+  rejection code `[304]` context.
+- `smsmanager-services` v1.0.0 — order paid services (alphanumeric senders, dedicated numbers,
+  SIM hosting) with mandatory dry-run fee preview, check credit balance, cancel at period end
+  (`GET /credit`, `GET /credit/services`, `POST /credit/order`, `POST /credit/cancel`). New
+  `Account` category.
+- `smsmanager-bulk-messaging` v1.0.0 — JSONL bulk campaigns via presigned upload
+  (`POST /messaging/url` + PUT), structural validation without sending
+  (`POST /messaging/validate`), cancelling scheduled messages and bulk uploads
+  (`POST /messaging/cancel`). Runnable `upload_bulk.cjs` script.
+
+### Changed
+
+- `smsmanager-messaging-api` v1.2.0 — cross-references bulk messaging for large campaigns and
+  scheduled-send cancellation (SKILL.md + `references/scheduling.md`).
+- `smsmanager-delivery-reports` v1.2.0 — STOP-handling pattern now persists opt-outs via
+  `POST /optout`.
+- `smsmanager-message-status` v1.1.0 — inbox sweep pattern persists opt-outs via `POST /optout`.
+- `smsmanager-authentication` v1.1.1 — description generalized to cover all catalog skills.
+
 ## 2026-09-15 — catalog 0.2.0
 
 ### Added

@@ -3,7 +3,7 @@ name: smsmanager-delivery-reports
 description: "Receives SmsManager delivery status, inbound messages and inbound replies via webhooks. Use when handling delivery reports (delivered, undelivered, failed, seen), setting a per-message callback URL, building two-way SMS, processing replies or inbound Viber/WhatsApp messages, interpreting rejection codes, verifying webhook payloads, or correlating webhooks with sent messages via request_id, message_id and custom payload. Do NOT use for sending messages (see smsmanager-messaging-api) or for polling status via the REST API (see smsmanager-message-status)."
 metadata:
   author: SmsManager
-  version: 1.1.0
+  version: 1.2.0
   category: Messaging
   tags: webhooks, delivery-reports, dlr, status, callback, inbound, two-way-sms, replies, viber, whatsapp, rcs, rejection-codes
   uses:
@@ -114,6 +114,9 @@ if (e.type === "incoming" && /^stop/i.test((e.body || "").trim())) {
 }
 ```
 
+Persist the opt-out on the SmsManager side too, so future `promotional` sends are blocked at the
+platform level: `POST /optout` with the number — see smsmanager-optout-blacklist.
+
 ## Gotchas and Best Practices
 
 - **The body is always a JSON array**, even for a single event. Normalize with
@@ -143,4 +146,5 @@ if (e.type === "incoming" && /^stop/i.test((e.body || "").trim())) {
 
 - Developer docs / API reference: https://smsmanager.com/docs (Czech: https://smsmanager.cz/docs)
 - Dashboard: https://app.smsmanager.com/app/developers/
-- Related skills: smsmanager-messaging-api, smsmanager-authentication, smsmanager-message-status
+- Related skills: smsmanager-messaging-api, smsmanager-authentication, smsmanager-message-status,
+  smsmanager-optout-blacklist

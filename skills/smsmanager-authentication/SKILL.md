@@ -1,9 +1,9 @@
 ---
 name: smsmanager-authentication
-description: "Configures SmsManager API credentials and authentication for the JSON API v2 (sending) and the REST API v1 (status, inbox, account). Use when setting up an API key, choosing between the x-api-key header and the apikey query parameter, configuring the base URLs, or troubleshooting 401 Unauthorized / 403 Forbidden / invalid API key errors against any SmsManager endpoint. This is the shared auth setup used by smsmanager-messaging-api, smsmanager-delivery-reports and smsmanager-message-status."
+description: "Configures SmsManager API credentials and authentication for the JSON API v2 (sending) and the REST API v1 (status, inbox, account). Use when setting up an API key, choosing between the x-api-key header and the apikey query parameter, configuring the base URLs, or troubleshooting 401 Unauthorized / 403 Forbidden / invalid API key errors against any SmsManager endpoint. This is the shared auth setup used by all SmsManager skills."
 metadata:
   author: SmsManager
-  version: 1.1.0
+  version: 1.1.1
   category: Core
   tags: authentication, api-key, credentials, x-api-key, apikey, 401, 403, setup, rest-api
 ---

@@ -3,7 +3,7 @@ name: smsmanager-messaging-api
 description: "Sends SMS, Viber, WhatsApp and RCS messages through the SmsManager JSON API v2 across Czech, Slovak and European networks. Use when sending a transactional or marketing SMS, sending a priority message or one-time password, sending to multiple recipients, sending a batch of different messages, choosing a sender ID or sender alias, sending Unicode/diacritics correctly, scheduling messages, using the omnichannel flow with channel fallback, shortening links, tagging messages, or attaching a custom payload. Endpoints: POST /message, POST /message/priority, POST /messages, GET/POST /simple/message. Do NOT use for receiving delivery reports or inbound replies (see smsmanager-delivery-reports)."
 metadata:
   author: SmsManager
-  version: 1.1.0
+  version: 1.2.0
   category: Messaging
   tags: sms, bulk-sms, transactional, marketing, viber, whatsapp, rcs, omnichannel, flow, sender-id, sender-alias, unicode, gsm7, scheduling, batch, priority, otp, czech, slovak, europe
   uses:
@@ -133,7 +133,9 @@ recipient country — useful for one campaign spanning CZ/SK/EU.
 ### Scheduling
 
 Use `datetime` for an exact UTC send time, and/or `delivery_time` to constrain delivery to certain
-days and hours in a timezone. See [references/scheduling.md](references/scheduling.md).
+days and hours in a timezone. See [references/scheduling.md](references/scheduling.md). A scheduled
+message can be cancelled before sending via REST `POST /messaging/cancel` (see
+smsmanager-bulk-messaging).
 
 ## Common Patterns
 
@@ -196,7 +198,8 @@ Language code samples: [Node.js](references/examples/node.md) · [PHP](reference
   gateway can resolve automatically from your registered sender (a dedicated virtual number selects
   `direct`, including `direct` pricing); an explicitly set `gateway` always wins.
 - **Limits.** Up to 10 recipients per message; up to 10 messages per `/messages` call (so up to ~100
-  recipients per API call). For larger campaigns, page across multiple calls.
+  recipients per API call). For larger campaigns, upload a JSONL bulk file instead — see
+  smsmanager-bulk-messaging.
 - **`ttl` is in minutes** — the time-to-live before an undelivered message expires.
 - **Scheduling is UTC.** `datetime` is always interpreted as UTC; use `delivery_time.tz` for local
   windows.
@@ -216,4 +219,5 @@ Language code samples: [Node.js](references/examples/node.md) · [PHP](reference
 - Developer docs / API reference: https://smsmanager.com/docs (Czech: https://smsmanager.cz/docs)
 - Dashboard / API keys: https://app.smsmanager.com/app/developers/
 - WhatsApp settings: https://app.smsmanager.com/whatsapp
-- Related skills: smsmanager-authentication, smsmanager-delivery-reports, smsmanager-message-status
+- Related skills: smsmanager-authentication, smsmanager-delivery-reports,
+  smsmanager-message-status, smsmanager-bulk-messaging, smsmanager-services
