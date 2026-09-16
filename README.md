@@ -67,6 +67,15 @@ loads only what it needs.
   `SMSMANAGER_BASE_URL`, `SMSMANAGER_REST_BASE_URL`, `SMSMANAGER_SENDER`), never hardcoded.
 - **Phone numbers:** international E.164 format without a leading `+` or `00` (e.g. `420777123456`).
 
+## Hosted MCP server
+
+These skills are the **knowledge layer**. For the **action layer** — an AI assistant operating a
+real SmsManager account (send messages, check delivery, manage keys, credit and senders) — connect
+the hosted MCP server at `https://app-api.smsmanager.com/functions/v1/mcp` (OAuth sign-in, no API
+keys to configure). Documentation: [smsmngr/smsmanager-mcp](https://github.com/smsmngr/smsmanager-mcp).
+Cursor users get both layers at once via
+[smsmngr/smsmanager-cursor-plugin](https://github.com/smsmngr/smsmanager-cursor-plugin).
+
 ## Contributing
 
 See [CLAUDE.md](CLAUDE.md) for the full authoring guide and [AGENTS.md](AGENTS.md) for a quick
